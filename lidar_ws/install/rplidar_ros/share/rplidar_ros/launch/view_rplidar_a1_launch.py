@@ -1,0 +1,1 @@
+/home/mikrobagger/MA/lidar_ws/src/rplidar_ros/launch/view_rplidar_a1_launch.py
