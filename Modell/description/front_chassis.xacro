@@ -1,0 +1,239 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+    <xacro:include filename="inertia.xacro" />
+
+<xacro:property name="front_chassis_length" value="0.34"/>
+<xacro:property name="front_chassis_width" value="0.13"/>
+<xacro:property name="front_chassis_height" value="0.07"/>
+
+<xacro:property name="bumper_radius" value="0.03"/>
+<xacro:property name="bumper_length" value="0.25"/>
+
+<xacro:property name="wheel_radius" value="0.06"/>
+<xacro:property name="wheel_length" value="0.06"/>
+
+
+<link name="base_link">
+</link>
+
+
+<!--FRONT CHASSIS-->
+<joint name="base_link_to_front_chassis" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_chassis"/>
+    <origin xyz="-0.11 0 0"/>
+</joint>
+
+<link name="front_chassis">
+
+    <visual>
+        <origin xyz="${front_chassis_length/2} 0 ${front_chassis_height/2}" rpy="0 0 0"/>
+        <geometry>
+            <box size="${front_chassis_length} ${front_chassis_width} ${front_chassis_height}"/>
+        </geometry>
+        <material name="blue"/>
+    </visual>
+    <collision>
+        <origin xyz="${front_chassis_length/2} 0 ${front_chassis_height/2}" rpy="0 0 0"/>
+        <geometry>
+            <box size="${front_chassis_length} ${front_chassis_width} ${front_chassis_height}"/>
+        </geometry>
+        <material name="blue"/>
+    </collision>
+    <xacro:inertial_box mass="2" x="${front_chassis_length}" y="${front_chassis_width}" z="${front_chassis_height}">
+        <origin xyz="${front_chassis_length/2} 0 ${front_chassis_height/2}" rpy="0 0 0"/>
+    </xacro:inertial_box>
+</link>
+
+<!--FRONT BOX-->
+<joint name="base_link_to_front_box" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_box"/>
+    <origin xyz="-0.11 0 0"/>
+</joint>
+
+<link name="front_box">
+
+    <visual>
+        <origin xyz="0.1 0 ${front_chassis_height+0.0875}" rpy="0 0 0"/>
+        <geometry>
+            <box size="-0.2 0.2 0.175"/>
+        </geometry>
+        <material name="blue"/>
+    </visual>
+    <collision>
+        <origin xyz="0.1 0 ${front_chassis_height+0.0875}" rpy="0 0 0"/>
+        <geometry>
+            <box size="-0.2 0.2 0.175"/>
+        </geometry>
+        <material name="blue"/>
+    </collision>
+    <xacro:inertial_box mass="2" x="0.2" y="0.2" z="0.175">
+        <origin xyz="0.1 0 ${front_chassis_height+0.0875}" rpy="0 0 0"/>
+    </xacro:inertial_box>
+</link>
+
+<gazebo reference="front_chassis">
+    <material>Gazebo/Blue</material>
+</gazebo>
+
+<!--LIDAR-->
+<joint name="front_chassis_to_laser" type="fixed">
+    <parent link="front_chassis"/>
+    <child link="laser"/>
+    <origin xyz="0.135 0 ${front_chassis_height+0.175}"/>
+</joint>
+
+<link name="laser">
+    <visual>
+        <origin xyz="0 0 0.02" rpy="0 0 0"/>
+        <geometry>
+            <cylinder length="0.04" radius="0.04"/>
+        </geometry>
+        <material name="red"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0.02" rpy="0 0 0"/>
+        <geometry>
+            <cylinder length="0.04" radius="0.04"/>
+        </geometry>
+        <material name="red"/>
+    </collision>
+    <xacro:inertial_cylinder mass="0.1" length="0.04" radius="0.04">
+        <origin xyz="0 0 0.02" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="bumper">
+    <material>Gazebo/Red</material>
+</gazebo> 
+
+<!--BUMPER-->
+<joint name="front_chassis_to_bumper" type="fixed">
+    <parent link="front_chassis"/>
+    <child link="bumper"/>
+    <origin xyz="${front_chassis_length} 0 ${front_chassis_height-bumper_radius}"/>
+</joint>
+
+<link name="bumper">
+    <visual>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry>
+            <cylinder length="${bumper_length}" radius="${bumper_radius}"/>
+        </geometry>
+        <material name="blue"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <cylinder length="${bumper_length}" radius="${bumper_radius}"/>
+        </geometry>
+        <material name="blue"/>
+    </collision>
+    <xacro:inertial_cylinder mass="1" length="${bumper_length}" radius="${bumper_radius}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="bumper">
+    <material>Gazebo/Blue</material>
+</gazebo>
+
+
+<!--FRONT WHEEL DRIVE-->
+<joint name="base_to_FWD" type="continuous">
+    <parent link="base_link"/>
+    <child link="FWD"/>
+    <origin xyz="0 0 0" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+</joint>
+
+<link name="FWD">
+    <visual>
+        <geometry>
+            <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+            <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="black"/>
+    </collision>
+    <xacro:inertial_cylinder mass="0.1" length="${wheel_length}" radius="${wheel_radius}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="FWD">
+    <material>Gazebo/Black</material>
+</gazebo>
+
+<!--LEFT FRONT WHEEL-->
+<joint name="base_to_LFW" type="fixed">
+    <parent link="base_link"/>
+    <child link="LFW"/>
+    <origin xyz="0 ${front_chassis_width/2+wheel_length/2+0.005} 0" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+</joint>
+
+<link name="LFW">
+    <visual>
+        <geometry>
+            <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+            <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="black"/>
+    </collision>
+    <xacro:inertial_cylinder mass="0.1" length="${wheel_length}" radius="${wheel_radius}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="LFW">
+    <material>Gazebo/Black</material>
+    <mu1 value="0.001"/>
+    <mu2 value="0.001"/>
+</gazebo>
+
+
+<!--RIGHT FRONT WHEEL-->
+<joint name="base_to_RFW" type="fixed">
+    <parent link="base_link"/>
+    <child link="RFW"/>
+    <origin xyz="0 ${-front_chassis_width/2-wheel_length/2-0.005} 0" rpy="1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+</joint>
+
+<link name="RFW">
+    <visual>
+        <geometry>
+            <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+            <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="black"/>
+    </collision>
+    <xacro:inertial_cylinder mass="0.1" length="${wheel_length}" radius="${wheel_radius}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="RFW">
+    <material>Gazebo/Black</material>
+    <mu1 value="0.001"/>
+    <mu2 value="0.001"/>
+</gazebo>
+
+</robot>
